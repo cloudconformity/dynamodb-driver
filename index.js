@@ -179,11 +179,19 @@ module.exports = function (dynamoDbOptions) {
               return paginate(data.LastEvaluatedKey);
             }
 
-            return items;
+            return items;            
           });
       };
 
       return paginate();
+    }
+
+    if (options && options.limit) {
+      params.Limit = options.limit
+    }
+
+    if (options && options.exclusiveStartKey) {
+      params.ExclusiveStartKey = options.exclusiveStartKey
     }
 
     return dynamodb
@@ -195,7 +203,10 @@ module.exports = function (dynamoDbOptions) {
           items.push(utils.deitemize(item));
         });
 
-        return items;
+        return {
+          items,
+          lastEvaluatedKey: data.LastEvaluatedKey
+        }
       });
   };
 
